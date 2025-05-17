@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { Book, GraduationCap, Headphones, MessageSquare, Pen } from 'lucide-react';
 import GrammarSection from './week-sections/GrammarSection';
@@ -19,41 +19,81 @@ interface Week {
   skills: Skill[];
 }
 
+type SectionType = 'grammar' | 'reading' | 'listening' | 'writing' | 'speaking';
+
 interface WeeklyContentProps {
   weeks: Week[];
+  defaultSection?: SectionType;
 }
 
-const WeeklyContent: React.FC<WeeklyContentProps> = ({ weeks }) => {
+const WeeklyContent: React.FC<WeeklyContentProps> = ({ weeks, defaultSection }) => {
   const { weekId } = useParams();
+  const [activeSection, setActiveSection] = useState<SectionType>(defaultSection || 'grammar');
+  const [isLoading, setIsLoading] = useState(true);
   const weekIndex = weekId ? parseInt(weekId) - 1 : 0;
   const week = weeks[weekIndex];
+
+  useEffect(() => {
+    // Simulate loading content
+    const timer = setTimeout(() => {
+      setIsLoading(false);
+    }, 500);
+    return () => clearTimeout(timer);
+  }, [weekId, activeSection]);
 
   if (!week) {
     return <div>Week not found</div>;
   }
 
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-600"></div>
+      </div>
+    );
+  }
+
+  const sections: { id: SectionType; label: string; icon: React.ElementType }[] = [
+    { id: 'grammar', label: 'Grammar', icon: Book },
+    { id: 'reading', label: 'Reading', icon: GraduationCap },
+    { id: 'listening', label: 'Listening', icon: Headphones },
+    { id: 'writing', label: 'Writing', icon: Pen },
+    { id: 'speaking', label: 'Speaking', icon: MessageSquare },
+  ];
+
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
       <h1 className="text-3xl font-bold text-gray-900 mb-8">{week.title}</h1>
 
-      <div className="grid gap-8">
-        <div className="bg-white rounded-lg shadow p-6">
-          <h2 className="text-xl font-semibold text-gray-900 mb-4">Topics</h2>
-          <ul className="space-y-2">
-            {week.topics.map((topic, index) => (
-              <li key={index} className="flex items-center text-gray-700">
-                <span className="w-2 h-2 bg-blue-600 rounded-full mr-2"></span>
-                {topic}
-              </li>
+      <div className="mb-8">
+        <div className="border-b border-gray-200">
+          <nav className="-mb-px flex space-x-8">
+            {sections.map(({ id, label, icon: Icon }) => (
+              <button
+                key={id}
+                onClick={() => setActiveSection(id)}
+                className={`
+                  flex items-center py-4 px-1 border-b-2 font-medium text-sm
+                  ${activeSection === id
+                    ? 'border-blue-600 text-blue-600'
+                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                  }
+                `}
+              >
+                <Icon className="h-5 w-5 mr-2" />
+                {label}
+              </button>
             ))}
-          </ul>
+          </nav>
         </div>
+      </div>
 
-        <GrammarSection weekId={weekIndex + 1} />
-        <ReadingSection weekId={weekIndex + 1} />
-        <ListeningSection weekId={weekIndex + 1} />
-        <WritingSection weekId={weekIndex + 1} />
-        <SpeakingSection weekId={weekIndex + 1} />
+      <div className="grid gap-8">
+        {activeSection === 'grammar' && <GrammarSection weekId={weekIndex + 1} />}
+        {activeSection === 'reading' && <ReadingSection weekId={weekIndex + 1} />}
+        {activeSection === 'listening' && <ListeningSection weekId={weekIndex + 1} />}
+        {activeSection === 'writing' && <WritingSection weekId={weekIndex + 1} />}
+        {activeSection === 'speaking' && <SpeakingSection weekId={weekIndex + 1} />}
 
         <div className="bg-white rounded-lg shadow p-6">
           <h2 className="text-xl font-semibold text-gray-900 mb-4">Skills Practice</h2>

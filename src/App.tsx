@@ -1,9 +1,17 @@
-import React from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import { Book, GraduationCap, Headphones, MessageSquare, Pen } from 'lucide-react';
+import React, { Suspense } from 'react';
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { Book, Headphones, MessageSquare, Pen } from 'lucide-react';
 import Navbar from './components/Navbar';
 import Home from './components/Home';
 import WeeklyContent from './components/WeeklyContent';
+import ErrorBoundary from './components/ErrorBoundary';
+import NotFound from './components/NotFound';
+
+const LoadingSpinner = () => (
+  <div className="min-h-screen flex items-center justify-center bg-gray-50">
+    <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-600"></div>
+  </div>
+);
 
 function App() {
   const weeks = [
@@ -74,15 +82,25 @@ function App() {
   ];
 
   return (
-    <Router>
-      <div className="min-h-screen bg-gray-50">
-        <Navbar />
-        <Routes>
-          <Route path="/" element={<Home weeks={weeks} />} />
-          <Route path="/week/:weekId" element={<WeeklyContent weeks={weeks} />} />
-        </Routes>
-      </div>
-    </Router>
+    <BrowserRouter basename="/EnglishB1_Diego/">
+      <ErrorBoundary>
+        <div className="min-h-screen bg-gray-50">
+          <Navbar />
+          <Suspense fallback={<LoadingSpinner />}>
+            <Routes>
+              <Route path="/" element={<Home weeks={weeks} />} />
+              <Route path="/week/:weekId" element={<WeeklyContent weeks={weeks} />} />
+              <Route path="/grammar" element={<WeeklyContent weeks={weeks} defaultSection="grammar" />} />
+              <Route path="/listening" element={<WeeklyContent weeks={weeks} defaultSection="listening" />} />
+              <Route path="/reading" element={<WeeklyContent weeks={weeks} defaultSection="reading" />} />
+              <Route path="/speaking" element={<WeeklyContent weeks={weeks} defaultSection="speaking" />} />
+              <Route path="/writing" element={<WeeklyContent weeks={weeks} defaultSection="writing" />} />
+              <Route path="*" element={<NotFound />} />
+            </Routes>
+          </Suspense>
+        </div>
+      </ErrorBoundary>
+    </BrowserRouter>
   );
 }
 
