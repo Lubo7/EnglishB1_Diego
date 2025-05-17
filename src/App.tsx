@@ -82,7 +82,7 @@ function App() {
   ];
 
   return (
-    <BrowserRouter basename="/EnglishB1_Diego/">
+    <BrowserRouter basename="/EnglishB1_Diego">
       <ErrorBoundary>
         <div className="min-h-screen bg-gray-50">
           <Navbar />
@@ -90,11 +90,6 @@ function App() {
             <Routes>
               <Route path="/" element={<Home weeks={weeks} />} />
               <Route path="/week/:weekId" element={<WeeklyContent weeks={weeks} />} />
-              <Route path="/grammar" element={<WeeklyContent weeks={weeks} defaultSection="grammar" />} />
-              <Route path="/listening" element={<WeeklyContent weeks={weeks} defaultSection="listening" />} />
-              <Route path="/reading" element={<WeeklyContent weeks={weeks} defaultSection="reading" />} />
-              <Route path="/speaking" element={<WeeklyContent weeks={weeks} defaultSection="speaking" />} />
-              <Route path="/writing" element={<WeeklyContent weeks={weeks} defaultSection="writing" />} />
               <Route path="*" element={<NotFound />} />
             </Routes>
           </Suspense>
